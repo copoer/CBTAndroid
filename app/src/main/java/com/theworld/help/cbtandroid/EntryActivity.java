@@ -11,7 +11,7 @@ import android.widget.Button;
 import java.util.ArrayList;
 
 public class EntryActivity extends AppCompatActivity {
-    private Button save;
+    private Button save, delete;
     private TextInputEditText
             title,
             situation,
@@ -38,20 +38,33 @@ public class EntryActivity extends AppCompatActivity {
         alt = findViewById(R.id.alt);
         outcome = findViewById(R.id.outcome);
 
+        //Buttons
+        save = (Button) findViewById(R.id.savebutton);
+        delete = (Button) findViewById(R.id.deleteButton);
+
+
         Intent intent = getIntent();
         entry = intent.getIntExtra(CustomAdapter.ENTRY, -1);
         if (entry >= 0) {
             loadEntry(entry);
+            delete.setVisibility(View.VISIBLE);
         }
 
 
         //Save entry on click
-        save = (Button) findViewById(R.id.savebutton);
         save.setOnClickListener(new View.OnClickListener() {
              @Override
              public void onClick(View v) {
                  saveEntry();
              }
+        });
+
+        //Delete entry on click
+        delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deleteEntry();
+            }
         });
 
     }
@@ -69,6 +82,16 @@ public class EntryActivity extends AppCompatActivity {
         against.setText(entry.getAgainst());
         alt.setText(entry.getAlt());
         outcome.setText(entry.getOutcome());
+    }
+
+
+    private void deleteEntry() {
+        Files file = new Files(this);
+        ArrayList<Entry> collection = file.read();
+        collection.remove(entry);
+        file.write(collection);
+        setResult(RESULT_OK, null);
+        finish();
     }
 
     private void saveEntry() {
